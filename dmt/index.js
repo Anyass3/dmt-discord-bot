@@ -17,7 +17,13 @@ client.login(TOKEN);
 client.on('messageCreate', async (message) => {
     console.log('content', message.content);
     if (!message.author?.bot) {
-        message.reply(`you sent ${message.content || 'an empty message'}`);
+        if (message.guildId) {
+            message.reply(`you sent ${Buffer.from(message.content, 'utf-8').toString('base64')}`);
+        }
+        else if (message.author) {
+            message.author.send(`you sent ${Buffer.from(message.content, 'utf-8').toString('base64')}`);
+        }
+
     }
 });
 
@@ -32,7 +38,7 @@ client.on('ready', async () => {
 const sendMessage = (message = 'Sending updates', channel_id = CHANNEL_ID) => {
     if (!client.isReady()) {
         client.once('ready', () => {
-            sendUpdates(message);
+            sendMessage(message);
         })
         return;
     }
@@ -41,7 +47,7 @@ const sendMessage = (message = 'Sending updates', channel_id = CHANNEL_ID) => {
     channel.send(message);
 }
 
-const stringifyObj = (obj, lang) => "```" + lang || '' + "\n" + JSON.stringify(obj, null, 2) + "\n```"
+const stringifyObj = (obj, lang) => "```" + (lang || '') + "\n" + JSON.stringify(obj, null, 2) + "\n```"
 
 export function init(program) {
     program.on('dmtapp::search::query', obj => {

@@ -54,7 +54,7 @@ export const listenForCommands = (client) => {
                 interaction.reply('Boop.');
                 break;
             case 'server':
-                interaction.reply('Guild name: ' + interaction.guild?.name + 'Guild Id: ' + interaction.guild?.id + '\nTotal members: ' + interaction.guild?.memberCount);
+                interaction.reply('Guild name: ' + interaction.guild?.name + '\nGuild Id: ' + interaction.guild?.id + '\nTotal members: ' + interaction.guild?.memberCount);
                 break;
             case 'channel':
                 interaction.reply('Channel name: ' + interaction.channel?.name + '\nChannel Id: ' + interaction.channel?.id + '\nTotal messages: ' + interaction.channel?.messageCount);
