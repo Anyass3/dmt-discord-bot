@@ -43,7 +43,7 @@ client.on('ready', async () => {
     listenForCommands(client);
 });
 
-const sendMessage = (message = 'Sending updates', { channel_id = CHANNEL_ID, hideLinkEmbedPreview = true } = {}) => {
+const sendMessage = async (message = 'Sending updates', { channel_id = CHANNEL_ID, hideLinkEmbedPreview = true } = {}) => {
     if (!client.isReady()) {
         client.once('ready', () => {
             sendMessage(message);
@@ -52,8 +52,8 @@ const sendMessage = (message = 'Sending updates', { channel_id = CHANNEL_ID, hid
     }
     const channel = client.channels.cache.get(channel_id);
     if (!channel) return console.log('channel is not defined');
-    const _message = channel.send(message);
-    if (hideLinkEmbedPreview) {
+    const _message = await channel.send(message);
+    if (hideLinkEmbedPreview && _message) {
         _message.edit({ flags: 'SuppressEmbeds' });
     }
 }
