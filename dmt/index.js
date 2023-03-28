@@ -46,7 +46,7 @@ client.on('ready', async () => {
 const sendMessage = async (message = 'Sending updates', { channel_id = CHANNEL_ID, hideLinkEmbedPreview = true } = {}) => {
     if (!client.isReady()) {
         client.once('ready', () => {
-            sendMessage(message);
+            sendMessage(message, { channel_id: CHANNEL_ID, hideLinkEmbedPreview });
         })
         return;
     }
