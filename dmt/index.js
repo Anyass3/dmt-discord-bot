@@ -43,17 +43,18 @@ client.on('ready', async () => {
     listenForCommands(client);
 });
 
-const sendMessage = async (message = 'Sending updates', { channel_id = CHANNEL_ID, hideLinkEmbedPreview = true } = {}) => {
+const sendMessage = async (message = 'Sending updates', args = {}) => {
+    const { channelId = CHANNEL_ID, disableLinkPreview = true } = args;
     if (!client.isReady()) {
         client.once('ready', () => {
-            sendMessage(message, { channel_id: CHANNEL_ID, hideLinkEmbedPreview });
+            sendMessage(message, args);
         })
         return;
     }
-    const channel = client.channels.cache.get(channel_id);
+    const channel = client.channels.cache.get(channelId);
     if (!channel) return console.log('channel is not defined');
     const _message = await channel.send(message);
-    if (hideLinkEmbedPreview && _message) {
+    if (disableLinkPreview && _message) {
         _message.edit({ flags: 'SuppressEmbeds' });
     }
 }
@@ -69,9 +70,9 @@ export function init(program) {
         sendMessage('DMT engine ready')
     })
 
-    program.on('discord-bot', ({ message, channel_id, lang, hideLinkEmbedPreview }) => {
-        if (typeof message != 'object') return sendMessage(String(message), { channel_id, hideLinkEmbedPreview });
+    program.on('discord-bot', ({ message, channelId, lang, hideLinkEmbedPreview }) => {
+        if (typeof message != 'object') return sendMessage(String(message), { channelId, hideLinkEmbedPreview });
 
-        sendMessage(stringifyObj(obj, lang), channel_id);
+        sendMessage(stringifyObj(obj, lang), channelId);
     })
 }
