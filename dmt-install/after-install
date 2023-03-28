@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ~/.dmt/etc/.bash_aliases_bundle # dirsync, colors, dmt_def_reader
+
+dmt restart
