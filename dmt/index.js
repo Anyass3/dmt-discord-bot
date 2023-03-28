@@ -15,15 +15,23 @@ const client = new Client({
 client.login(TOKEN);
 
 client.on('messageCreate', async (message) => {
-    console.log('content', message.content);
+    console.log('content', message);
+    /**
+     * @type {typeof message}
+     * */
+    let msg
+    let reply = `you sent ${Buffer.from(message.content, 'utf-8').toString('base64')} \nhttps://github.com`;
     if (!message.author?.bot) {
         if (message.guildId) {
-            message.reply(`you sent ${Buffer.from(message.content, 'utf-8').toString('base64')}`);
+            msg = await message.reply(reply);
+
         }
         else if (message.author) {
-            message.author.send(`you sent ${Buffer.from(message.content, 'utf-8').toString('base64')}`);
+            msg = message.author.send(reply);
         }
-
+        if (msg) {
+            msg.edit({ flags: 'SuppressEmbeds' });
+        }
     }
 });
 
@@ -35,7 +43,7 @@ client.on('ready', async () => {
     listenForCommands(client);
 });
 
-const sendMessage = (message = 'Sending updates', channel_id = CHANNEL_ID) => {
+const sendMessage = (message = 'Sending updates', { channel_id = CHANNEL_ID, hideLinkEmbedPreview = true } = {}) => {
     if (!client.isReady()) {
         client.once('ready', () => {
             sendMessage(message);
@@ -44,7 +52,10 @@ const sendMessage = (message = 'Sending updates', channel_id = CHANNEL_ID) => {
     }
     const channel = client.channels.cache.get(channel_id);
     if (!channel) return console.log('channel is not defined');
-    channel.send(message);
+    const _message = channel.send(message);
+    if (hideLinkEmbedPreview) {
+        _message.edit({ flags: 'SuppressEmbeds' });
+    }
 }
 
 const stringifyObj = (obj, lang) => "```" + (lang || '') + "\n" + JSON.stringify(obj, null, 2) + "\n```"
@@ -53,12 +64,13 @@ export function init(program) {
     program.on('dmtapp::search::query', obj => {
         sendMessage(stringifyObj(obj))
     })
+
     program.on('ready', () => {
         sendMessage('DMT engine ready')
     })
 
-    program.on('discord-bot', ({ message, channel_id, lang }) => {
-        if (typeof message != 'object') return sendMessage(String(message), channel_id);
+    program.on('discord-bot', ({ message, channel_id, lang, hideLinkEmbedPreview }) => {
+        if (typeof message != 'object') return sendMessage(String(message), { channel_id, hideLinkEmbedPreview });
 
         sendMessage(stringifyObj(obj, lang), channel_id);
     })
